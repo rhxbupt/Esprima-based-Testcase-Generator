@@ -1,2 +1,12 @@
-# HW2
-Homework 2 of CSC 519
+# CSC-519-HW2 #
+By xding3
+
+## Execution ##
+
+Run ``  
+
+## Screenshots ##
+
+
+## Specification ##
+
