@@ -13,6 +13,7 @@ function main()
 
 	if( args.length == 0 )
 	{
+		// Default file: subject.js
 		args = ["subject.js"];
 	}
 	var filePath = args[0];
@@ -53,9 +54,7 @@ function fakeDemo()
 	console.log( faker.phone.phoneFormats() );
 }
 
-var functionConstraints =
-{
-}
+var functionConstraints = {}
 
 var mockFileLibrary = 
 {
