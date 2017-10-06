@@ -3,7 +3,7 @@ By xding3
 
 ## Execution ##
 
-1. Install packages:  ``  
+1. Install packages:  `npm install`  
 2. Generate test files: `node main.js`
 3. See coverage: `node_modules\.bin\istanbul cover test.js` (Windows)
 4. (Optional) See a fully annotated html report: `start coverage/lcov-report/HW2/subject.js.html` (Windows)

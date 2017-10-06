@@ -62,11 +62,22 @@ var mockFileLibrary =
 	{
 		'path/fileExists': {}
 	},
+	pathNotExists:
+	{
+		'path/fileExists': {}
+	},
 	fileWithContent:
 	{
 		pathContent: 
 		{	
   			file1: 'text content',
+		}
+	},
+	fileWithoutContent:
+	{
+		pathContent: 
+		{	
+  			file1: '',
 		}
 	}
 };
@@ -107,7 +118,8 @@ function generateTestCases()
 		var params = initalizeParams(functionConstraints[funcName])
 		var altparams = initalizeParams(functionConstraints[funcName])
 		
-		//console.log( params );
+		//console.log( "Params: " + params );
+		//console.log( "ALTParams: " + altparams );
 
 		// update parameter values based on known constraints.
 		var constraints = functionConstraints[funcName].constraints;
@@ -118,12 +130,13 @@ function generateTestCases()
 		fillParams(constraints,params,"value")
 		fillParams(constraints,altparams,"altvalue")
 		
-		//console.log("ALT",altparams)
-		//console.log("P",params)
+		console.log("ALT",altparams)
+		console.log("P",params)
 
 		// Prepare function arguments.
-		var args = Object.keys(params).map( function(k) {return params[k]; }).join(",");
-		var altargs = Object.keys(altparams).map( function(k) {return altparams[k]; }).join(",");
+		//var args = Object.keys(params).map( function(k) {return params[k]; }).join(",");
+		//var altargs = Object.keys(altparams).map( function(k) {return altparams[k]; }).join(",");
+		buildArgs(params, altparams, "", 0);
 		
 		if( pathExists || fileWithContent )
 		{
@@ -135,17 +148,36 @@ function generateTestCases()
 		}
 		else
 		{
-
-			console.log( altargs )
+			//console.log( args )
+			//console.log( altargs )
 			// Emit simple test case.
-			content += "subject.{0}({1});\n".format(funcName, args );
-			content += "subject.{0}({1});\n".format(funcName, altargs );
+			
+			for(var n in args) content += "subject.{0}({1});\n".format(funcName, args[n]);
 		}
 
 	}
 
 
 	fs.writeFileSync('test.js', content, "utf8");
+
+}
+
+var args = [];
+// Recursion method that prepares function arguments
+function buildArgs(param, altparam, arg, index)
+{
+	//console.log("Length", Object.keys(param).length);
+	if(index < Object.keys(param).length-1){
+		buildArgs(param, altparam, arg + param[Object.keys(param)[index]] + ",", index+1);
+		buildArgs(param, altparam, arg + altparam[Object.keys(altparam)[index]] + ",", index+1);
+	}else if(index == Object.keys(param).length-1){
+		buildArgs(param, altparam, arg + param[Object.keys(param)[index]], index+1);
+		buildArgs(param, altparam, arg + altparam[Object.keys(altparam)[index]], index+1);
+		
+	}else{
+		//console.log("Args", arg);
+		args.push(arg);
+	}
 
 }
 
@@ -184,7 +216,7 @@ function constraints(filePath)
 		if (node.type === 'FunctionDeclaration') 
 		{
 			var funcName = functionName(node);
-			console.log("Line : {0} Function: {1}".format(node.loc.start.line, funcName ));
+			//console.log("Line : {0} Function: {1}".format(node.loc.start.line, funcName ));
 
 			var params = node.params.map(function(p) {return p.name});
 
@@ -193,14 +225,16 @@ function constraints(filePath)
 			// Check for expressions using argument.
 			traverse(node, function(child)
 			{
-				if( child.type === 'BinaryExpression' && child.operator == "==")
+				
+				
+				if( child.type === 'BinaryExpression' && (child.operator == "==" || child.operator == "!=" ))
 				{
 					if( child.left.type == 'Identifier' && params.indexOf( child.left.name ) > -1)
 					{
 						// get expression from original source code:
 						var expression = buf.substring(child.range[0], child.range[1]);
 						var rightHand = buf.substring(child.right.range[0], child.right.range[1])
-
+						//console.log("rightHand: " + rightHand);
 						functionConstraints[funcName].constraints.push( 
 							new Constraint(
 							{
@@ -215,7 +249,7 @@ function constraints(filePath)
 					}
 				}
 
-				if( child.type === 'BinaryExpression' && child.operator == "<" )
+				if( child.type === 'BinaryExpression' && (child.operator == "<" || child.operator == "<=" || child.operator == ">" || child.operator == ">=") )
 				{
 					if( child.left.type == 'Identifier' && params.indexOf( child.left.name ) > -1)
 					{
@@ -236,6 +270,7 @@ function constraints(filePath)
 							}));
 					}
 				}
+				
 
 				if( child.type == "CallExpression" && 
 					 child.callee.property &&
