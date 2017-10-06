@@ -24,8 +24,8 @@ function main()
 
 }
 
-var engine = Random.engines.mt19937().autoSeed();
 
+var engine = Random.engines.mt19937().autoSeed();
 function createConcreteIntegerValue( greaterThan, constraintValue )
 {
 	if( greaterThan )
@@ -33,6 +33,7 @@ function createConcreteIntegerValue( greaterThan, constraintValue )
 	else
 		return Random.integer(constraintValue-10,constraintValue)(engine);
 }
+
 
 function Constraint(properties)
 {
@@ -90,7 +91,7 @@ function initalizeParams(constraints)
 	for (var i =0; i < constraints.params.length; i++ )
 	{
 		var paramName = constraints.params[i];
-		params[paramName] = '\'\'';
+		params[paramName] = []; // Change param into a array
 	}
 	return params;	
 }
@@ -103,7 +104,7 @@ function fillParams(constraints,params,property)
 		var constraint = constraints[c];
 		if( params.hasOwnProperty( constraint.ident ) )
 		{
-			params[constraint.ident] = constraint[property];
+			params[constraint.ident].push(constraint[property]);
 		}
 	}
 }
@@ -111,15 +112,12 @@ function fillParams(constraints,params,property)
 function generateTestCases()
 {
 	// Add mistery.js to test
-	var content = "var subject = require('./subject.js')\nvar subject = require('./mystery.js')\nvar mock = require('mock-fs');\n";
+	var content = "var subject = require('./subject.js');\nvar mock = require('mock-fs');\n" + "var mystery = require('./mystery.js');\n";
 	for ( var funcName in functionConstraints )
 	{
-
+		//console.log("FuncName", funcName);
 		var params = initalizeParams(functionConstraints[funcName])
 		var altparams = initalizeParams(functionConstraints[funcName])
-		
-		//console.log( "Params: " + params );
-		//console.log( "ALTParams: " + altparams );
 
 		// update parameter values based on known constraints.
 		var constraints = functionConstraints[funcName].constraints;
@@ -128,15 +126,15 @@ function generateTestCases()
 		var pathExists      = _.some(constraints, {kind: 'fileExists' });
 
 		fillParams(constraints,params,"value")
-		fillParams(constraints,altparams,"altvalue")
+		fillParams(constraints,params,"altvalue") // Put all param optional values into param array
 		
-		console.log("ALT",altparams)
-		console.log("P",params)
+		//console.log("ALT",altparams)
+		//console.log("P",params)
 
 		// Prepare function arguments.
 		//var args = Object.keys(params).map( function(k) {return params[k]; }).join(",");
 		//var altargs = Object.keys(altparams).map( function(k) {return altparams[k]; }).join(",");
-		buildArgs(params, altparams, "", 0);
+		var args = prepareArgs(funcName, params, altparams);
 		
 		if( pathExists || fileWithContent )
 		{
@@ -153,6 +151,7 @@ function generateTestCases()
 			// Emit simple test case.
 			
 			for(var n in args) content += "subject.{0}({1});\n".format(funcName, args[n]);
+			
 		}
 
 	}
@@ -164,30 +163,41 @@ function generateTestCases()
 
 //----------------------------------------------------------------------------------------------//
 
+var args = [];
+
 function prepareArgs(funcName, param, altparam){
-	var args = [];
+
+	args = [];
+	
+	var isSimpleFunction = false; // For the function that 
+	
+	//for
+	
+	buildArgs(param, altparam, "", 0);
 	
 	return args;
 }
 
-var args = [];
 // Recursion method that prepares function arguments
-function buildArgs(param, altparam, arg, index)
+function buildArgs(param, altparam, argStr, index)
 {
 	//console.log("Length", Object.keys(param).length);
 	if(index < Object.keys(param).length-1){
-		buildArgs(param, altparam, arg + param[Object.keys(param)[index]] + ",", index+1);
-		buildArgs(param, altparam, arg + altparam[Object.keys(altparam)[index]] + ",", index+1);
+		var paraName = Object.keys(param)[index];
+		for( var i in param[paraName]){
+			buildArgs(param, altparam, argStr + param[paraName][i] + ",", index+1);
+		}
+		
 	}else if(index == Object.keys(param).length-1){
-		buildArgs(param, altparam, arg + param[Object.keys(param)[index]], index+1);
-		buildArgs(param, altparam, arg + altparam[Object.keys(altparam)[index]], index+1);	
+		var paraName = Object.keys(param)[index];
+		for( var i in param[paraName]){
+			buildArgs(param, altparam, argStr + param[paraName][i], index+1);
+		}	
 	}else{
 		//console.log("Args", arg);
-		args.push(arg);
+		args.push(argStr);
 	}
-
 }
-
 
 
 function generateMockFsTestCases (pathExists,fileWithContent,funcName,args) 
@@ -234,6 +244,7 @@ function constraints(filePath)
 			// Check for expressions using argument.
 			traverse(node, function(child)
 			{
+				
 				
 				if( child.type === 'BinaryExpression' && (child.operator == "==" || child.operator == "!=" ))
 				{
@@ -285,7 +296,7 @@ function constraints(filePath)
 									{
 										ident: child.left.name,
 										value: rightHand,
-										altvalue: "\""+"Salt"+"\"", 
+										altvalue: "\"Salt\"", 
 										funcName: funcName,
 										kind: "string",
 										operator : child.operator,
@@ -303,6 +314,29 @@ function constraints(filePath)
 						
 						
 						
+					}// Left is a method call containing param
+					else if( child.left.type === 'CallExpression' && params.indexOf( child.left.callee.object.name ) > -1 )
+					{
+						// get expression from original source code:
+						var expression = buf.substring(child.range[0], child.range[1]);
+						
+						// For method indexof
+						if( child.left.callee.property.name =='indexOf' ){
+							console.log("Callee", child.left.arguments[0].value);
+							var rightHand = genStr(child.left.arguments[0].value,parseInt(buf.substring(child.right.range[0], child.right.range[1])));
+							
+							functionConstraints[funcName].constraints.push( 
+								new Constraint(
+								{
+									ident: child.left.callee.object.name,
+									value: "\"" + rightHand + "\"",
+									altvalue: "\"\"", 
+									funcName: funcName,
+									kind: "string",
+									operator : child.operator,
+									expression: expression
+								}));
+						}
 					}
 				}
 				
@@ -310,7 +344,7 @@ function constraints(filePath)
 
 				if( child.type === 'BinaryExpression' && (child.operator == "<" || child.operator == "<=" || child.operator == ">" || child.operator == ">=") )
 				{
-					if( child.left.type == 'Identifier' && params.indexOf( child.left.name ) > -1)
+					if( child.left.type === 'Identifier' && params.indexOf( child.left.name ) > -1)
 					{
 						// get expression from original source code:
 						var expression = buf.substring(child.range[0], child.range[1]);
@@ -322,8 +356,8 @@ function constraints(filePath)
 								new Constraint(
 								{
 									ident: child.left.name,
-									value: createConcreteIntegerValue(false, parseInt(rightHand)),
-									altvalue: createConcreteIntegerValue(true, parseInt(rightHand)),
+									value: createConcreteIntegerValue(true, parseInt(rightHand)+1),
+									altvalue: createConcreteIntegerValue(false, parseInt(rightHand)-1),
 									funcName: funcName,
 									kind: "integer",
 									operator : child.operator,
@@ -378,7 +412,7 @@ function constraints(filePath)
 								expression: expression
 							}));
 						}
-					}
+					}					
 				}
 
 			});
@@ -419,6 +453,18 @@ function traverseWithCancel(object, visitor)
 	        }
 	    }
  	 }
+}
+
+// Generate a string which contains "substr" at index of "index"
+function genStr(substr, index){
+	var str = "";
+	
+	for(var i = 0; i < index; i++){
+		str += "S";
+	}
+	
+	str += substr;
+	return str;
 }
 
 function functionName( node )
