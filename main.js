@@ -110,8 +110,8 @@ function fillParams(constraints,params,property)
 
 function generateTestCases()
 {
-
-	var content = "var subject = require('./subject.js')\nvar mock = require('mock-fs');\n";
+	// Add mistery.js to test
+	var content = "var subject = require('./subject.js')\nvar subject = require('./mystery.js')\nvar mock = require('mock-fs');\n";
 	for ( var funcName in functionConstraints )
 	{
 
@@ -162,6 +162,14 @@ function generateTestCases()
 
 }
 
+//----------------------------------------------------------------------------------------------//
+
+function prepareArgs(funcName, param, altparam){
+	var args = [];
+	
+	return args;
+}
+
 var args = [];
 // Recursion method that prepares function arguments
 function buildArgs(param, altparam, arg, index)
@@ -172,14 +180,15 @@ function buildArgs(param, altparam, arg, index)
 		buildArgs(param, altparam, arg + altparam[Object.keys(altparam)[index]] + ",", index+1);
 	}else if(index == Object.keys(param).length-1){
 		buildArgs(param, altparam, arg + param[Object.keys(param)[index]], index+1);
-		buildArgs(param, altparam, arg + altparam[Object.keys(altparam)[index]], index+1);
-		
+		buildArgs(param, altparam, arg + altparam[Object.keys(altparam)[index]], index+1);	
 	}else{
 		//console.log("Args", arg);
 		args.push(arg);
 	}
 
 }
+
+
 
 function generateMockFsTestCases (pathExists,fileWithContent,funcName,args) 
 {
@@ -208,8 +217,8 @@ function generateMockFsTestCases (pathExists,fileWithContent,funcName,args)
 
 function constraints(filePath)
 {
-   var buf = fs.readFileSync(filePath, "utf8");
-	var result = esprima.parse(buf, options);
+	var buf = fs.readFileSync(filePath, "utf8");
+    var result = esprima.parse(buf, options);
 
 	traverse(result, function (node) 
 	{
@@ -226,28 +235,78 @@ function constraints(filePath)
 			traverse(node, function(child)
 			{
 				
-				
 				if( child.type === 'BinaryExpression' && (child.operator == "==" || child.operator == "!=" ))
 				{
-					if( child.left.type == 'Identifier' && params.indexOf( child.left.name ) > -1)
+					// Left is a param
+					if( child.left.type === 'Identifier' && params.indexOf( child.left.name ) > -1 )
 					{
 						// get expression from original source code:
 						var expression = buf.substring(child.range[0], child.range[1]);
 						var rightHand = buf.substring(child.right.range[0], child.right.range[1])
 						//console.log("rightHand: " + rightHand);
-						functionConstraints[funcName].constraints.push( 
-							new Constraint(
-							{
-								ident: child.left.name,
-								value: rightHand,
-								altvalue: !rightHand,
-								funcName: funcName,
-								kind: "integer",
-								operator : child.operator,
-								expression: expression
-							}));
+						
+						if( child.right.type === 'Literal'){ // Right is integer or string
+						
+							if( rightHand.includes("\"")){ // String
+							
+								functionConstraints[funcName].constraints.push( 
+									new Constraint(
+									{
+										ident: child.left.name,
+										value: rightHand,
+										altvalue: "\"" + rightHand.substring(1, rightHand.length-1)+"Salt"+"\"", // Add salt to string
+										funcName: funcName,
+										kind: "string",
+										operator : child.operator,
+										expression: expression
+									}));
+									
+							}else{ // integer
+							
+								functionConstraints[funcName].constraints.push( 
+									new Constraint(
+									{
+										ident: child.left.name,
+										value: rightHand,
+										altvalue: rightHand + createConcreteIntegerValue(true, parseInt(rightHand)),
+										funcName: funcName,
+										kind: "integer",
+										operator : child.operator,
+										expression: expression
+									}));
+								
+							}
+							
+						} else if( child.right.type === 'Identifier' ){
+							
+							if( rightHand === "undefined"){ // Undefined
+								functionConstraints[funcName].constraints.push( 
+									new Constraint(
+									{
+										ident: child.left.name,
+										value: rightHand,
+										altvalue: "\""+"Salt"+"\"", 
+										funcName: funcName,
+										kind: "string",
+										operator : child.operator,
+										expression: expression
+									}));
+							}
+							
+						}
+						
+					} // Left is not a param
+					else if ( child.left.type === 'Identifier' && params.indexOf( child.left.name ) <= -1 ) 
+					{
+						
+						
+						
+						
+						
 					}
 				}
+				
+				
 
 				if( child.type === 'BinaryExpression' && (child.operator == "<" || child.operator == "<=" || child.operator == ">" || child.operator == ">=") )
 				{
@@ -256,18 +315,23 @@ function constraints(filePath)
 						// get expression from original source code:
 						var expression = buf.substring(child.range[0], child.range[1]);
 						var rightHand = buf.substring(child.right.range[0], child.right.range[1])
+						
+						if( child.right.type === 'Literal'){// Right is integer
+							
+							functionConstraints[funcName].constraints.push( 
+								new Constraint(
+								{
+									ident: child.left.name,
+									value: createConcreteIntegerValue(false, parseInt(rightHand)),
+									altvalue: createConcreteIntegerValue(true, parseInt(rightHand)),
+									funcName: funcName,
+									kind: "integer",
+									operator : child.operator,
+									expression: expression
+								}));
+							
+						}
 
-						functionConstraints[funcName].constraints.push( 
-							new Constraint(
-							{
-								ident: child.left.name,
-								value: parseInt(rightHand) - 1,
-								altvalue: parseInt(rightHand) +1,
-								funcName: funcName,
-								kind: "integer",
-								operator : child.operator,
-								expression: expression
-							}));
 					}
 				}
 				
