@@ -105,7 +105,6 @@ var args = [];
 
 function generateTestCases()
 {
-	// Add mistery.js to test
 	var content = "var subject = require('./subject.js');\nvar mock = require('mock-fs');\n"// + "var subject = require('./subject.js');\n"
 	for ( var funcName in functionConstraints )
 	{
@@ -123,7 +122,7 @@ function generateTestCases()
 		fillParams(constraints,params,"altvalue") // Put all param optional values into param array
 		
 		//console.log("ALT",altparams)
-		console.log("P",params)
+		// console.log("P",params)
 		// Prepare function arguments.
 		//var args = Object.keys(params).map( function(k) {return params[k]; }).join(",");
 		//var altargs = Object.keys(altparams).map( function(k) {return altparams[k]; }).join(",");
@@ -221,7 +220,6 @@ function generateMockFsTestCases(pathExists,fileWithContent,funcName, args, buf,
 	}else{
 		if( pathExists)
 		{
-			// console.log("in path\n");
 			for (var attrname in mockFileLibrary.pathExists) { mergedFS[attrname] = mockFileLibrary.pathExists[attrname]; }
 				
 		}
@@ -238,12 +236,10 @@ function generateMockFsTestCases(pathExists,fileWithContent,funcName, args, buf,
 			for (var attrname in mockFileLibrary.fileWithContent) {  mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
 				mergedFS['path/fileExists'] = {'file1' : 'hello'};
 				mergedFS['pathContent'] = {};
-			// console.log("merge: " +mergedFS);
 		}
 
 		if( fileWithContent && ! buf ){
 			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
-			// mergedFS['path/fileExists']['file1']="hello";
 			mergedFS['pathContent']={'file1' : ''};
 		}
 		if( fileWithContent && buf ){
@@ -404,7 +400,7 @@ function constraints(filePath)
 						// get expression from original source code:
 						var expression = buf.substring(child.range[0], child.range[1]);
 						var rightHand = buf.substring(child.right.range[0], child.right.range[1])
-						console.log("Parse Result", parseInt(rightHand))
+						//console.log("Parse Result", parseInt(rightHand))
 						
 						functionConstraints[funcName].constraints.push( 
 							new Constraint(
@@ -506,7 +502,7 @@ function constraints(filePath)
 			});
 
 			
-			console.log( functionConstraints[funcName]);
+			//console.log( functionConstraints[funcName]);
 
 		}
 	});
