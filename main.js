@@ -137,27 +137,26 @@ function generateTestCases()
 			//content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args);
 			args = [];
 			buildArgs(params, "", 0);
-			console.log("Args",args);
+			//console.log("Args",args);
 			var buf = true;
 			var len = true;
-			for(var n in args){
-				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args[n],buf,len);
-				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args[n],!buf,len);
-				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args[n],buf,!len);
-				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args[n],!buf,!len);
-				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args[n],buf,len);
-				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args[n],!buf,len);
-				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args[n],buf,!len);
-				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args[n],!buf,!len);
-				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args[n],buf,len);
-				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args[n],!buf,len);
-				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args[n],buf,!len);
-				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args[n],!buf,!len);
-				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args[n],buf,len);
-				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args[n],!buf,len);
-				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args[n],buf,!len);
-				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args[n],!buf,!len);				
-			}
+
+				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,buf,len);
+				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,!buf,len);
+				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,buf,!len);
+				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,!buf,!len);
+				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,buf,len);
+				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,!buf,len);
+				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,buf,!len);
+				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,!buf,!len);
+				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,buf,len);
+				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,!buf,len);
+				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,buf,!len);
+				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,!buf,!len);
+				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,buf,len);
+				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,!buf,len);
+				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,buf,!len);
+				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,!buf,!len);				
 
 		} else// Generate Simple Test Cases
 		{
@@ -220,33 +219,44 @@ function generateMockFsTestCases(pathExists,fileWithContent,funcName, args, buf,
 	if(!pathExists){
 
 	}else{
-		for (var attrname in mockFileLibrary.pathExists) { mergedFS[attrname] = mockFileLibrary.pathExists[attrname]; }
-	}
-	
-					
+		if( pathExists)
+		{
+			// console.log("in path\n");
+			for (var attrname in mockFileLibrary.pathExists) { mergedFS[attrname] = mockFileLibrary.pathExists[attrname]; }
+				
+		}
 
-	if( fileWithContent)
-	{
-		mergedFS['path/fileExists'] = {'file1' : ''};
-	}
+		 if( fileWithContent)
+		{
+			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+			mergedFS['path/fileExists'] = {'file1' : ''};
 
-	if( !fileWithContent )
-	{
-		mergedFS['path/fileExists'] = {'file1' : 'hello'};
-		mergedFS['pathContent'] = {};
-	}
+		}
 
-	if( fileWithContent && !buf ){
-		mergedFS['pathContent']={'file1' : ''};
-	}
-	if( fileWithContent && buf ){
-		mergedFS['path/fileExists']={'file1' : 'hello'};
-		mergedFS['pathContent']={'file1' : 'hi'};
-	}
+		if( !fileWithContent )
+		{
+			for (var attrname in mockFileLibrary.fileWithContent) {  mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+				mergedFS['path/fileExists'] = {'file1' : 'hello'};
+				mergedFS['pathContent'] = {};
+			// console.log("merge: " +mergedFS);
+		}
 
-	if(len) {
-		mergedFS['path/fileExists'] = {};
-		mergedFS['pathContent'] = {};
+		if( fileWithContent && ! buf ){
+			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+			// mergedFS['path/fileExists']['file1']="hello";
+			mergedFS['pathContent']={'file1' : ''};
+		}
+		if( fileWithContent && buf ){
+			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+			mergedFS['path/fileExists']={'file1' : 'hello'};
+			mergedFS['pathContent']={'file1' : 'hi'};
+		}
+
+		if (len ) {
+			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+			mergedFS['path/fileExists'] = {};
+			mergedFS['pathContent'] = {};
+		}
 	}
 	
 	testCase += 
@@ -255,7 +265,7 @@ function generateMockFsTestCases(pathExists,fileWithContent,funcName, args, buf,
 		+
 	");\n";
 
-	testCase += "\tsubject.{0}({1});\n".format(funcName, args);
+	testCase += "\tsubject.{0}({1});\n".format(funcName, args[1]);
 	testCase+="mock.restore();\n";
 	return testCase;
 }
