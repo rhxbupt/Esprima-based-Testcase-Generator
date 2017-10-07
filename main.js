@@ -48,6 +48,8 @@ function Constraint(properties)
 	this.kind = properties.kind;
 }
 
+fakeDemo();
+
 function fakeDemo()
 {
 	console.log( faker.phone.phoneNumber() );
@@ -63,22 +65,11 @@ var mockFileLibrary =
 	{
 		'path/fileExists': {}
 	},
-	pathNotExists:
-	{
-		'path/fileExists': {}
-	},
 	fileWithContent:
 	{
 		pathContent: 
 		{	
   			file1: 'text content',
-		}
-	},
-	fileWithoutContent:
-	{
-		pathContent: 
-		{	
-  			file1: '',
 		}
 	}
 };
@@ -104,10 +95,13 @@ function fillParams(constraints,params,property)
 		var constraint = constraints[c];
 		if( params.hasOwnProperty( constraint.ident ) )
 		{
-			params[constraint.ident].push(constraint[property]);
+			if(!params[constraint.ident].includes(constraint[property]) && constraint[property] != undefined) // Check duplicate param options
+				params[constraint.ident].push(constraint[property]);
 		}
 	}
 }
+
+var args = [];
 
 function generateTestCases()
 {
@@ -129,69 +123,82 @@ function generateTestCases()
 		fillParams(constraints,params,"altvalue") // Put all param optional values into param array
 		
 		//console.log("ALT",altparams)
-		//console.log("P",params)
-
+		console.log("P",params)
 		// Prepare function arguments.
 		//var args = Object.keys(params).map( function(k) {return params[k]; }).join(",");
 		//var altargs = Object.keys(altparams).map( function(k) {return altparams[k]; }).join(",");
-		var args = prepareArgs(funcName, params, altparams);
 		
+
 		if( pathExists || fileWithContent )
 		{
-			content += generateMockFsTestCases(pathExists,fileWithContent,funcName, args);
+			//content += generateMockFsTestCases(pathExists,fileWithContent,funcName, args);
 			// Bonus...generate constraint variations test cases....
-			content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, args);
-			content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, args);
-			content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args);
-		}
-		else
+			//content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, args);
+			//content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, args);
+			//content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args);
+			args = [];
+			//buildArgs(params, "", 0);
+			console.log("Args",args);
+			var buf=true, len=true;
+			content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,buf,len);
+			content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,!buf,len);
+			content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,buf,!len);
+			content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,!buf,!len);
+
+			content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, args,buf,len);
+			content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, args,!buf,len);
+			content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, args,buf,!len);
+			content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, args,!buf,!len);
+
+			content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, args,buf,len);
+			content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, args,!buf,len);
+			content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, args,buf,!len);
+			content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, args,!buf,!len);
+
+			content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args,buf,len);
+			content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args,!buf,len);
+			content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args,buf,!len);
+			content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args,!buf,!len);
+		} else// Generate Simple Test Cases
 		{
-			//console.log( args )
+			args = [];
 			//console.log( altargs )
 			// Emit simple test case.
-			
+			buildArgs(params, "", 0);
+			//console.log( args )
 			for(var n in args) content += "subject.{0}({1});\n".format(funcName, args[n]);
 			
 		}
 
 	}
 
-
 	fs.writeFileSync('test.js', content, "utf8");
 
 }
 
-//----------------------------------------------------------------------------------------------//
-
-var args = [];
-
-function prepareArgs(funcName, param, altparam){
-
-	args = [];
-	
-	var isSimpleFunction = false; // For the function that 
-	
-	//for
-	
-	buildArgs(param, altparam, "", 0);
-	
-	return args;
-}
 
 // Recursion method that prepares function arguments
-function buildArgs(param, altparam, argStr, index)
+function buildArgs(param, argStr, index)
 {
 	//console.log("Length", Object.keys(param).length);
 	if(index < Object.keys(param).length-1){
 		var paraName = Object.keys(param)[index];
-		for( var i in param[paraName]){
-			buildArgs(param, altparam, argStr + param[paraName][i] + ",", index+1);
+		//console.log("Param",param[paraName]);
+		if(param[paraName].length == 0){
+			buildArgs(param, argStr + "\"TestString\"" + ",", index+1);
+		}else{
+			for( var i in param[paraName]){
+				buildArgs(param, argStr + param[paraName][i] + ",", index+1);
+			}
 		}
-		
 	}else if(index == Object.keys(param).length-1){
 		var paraName = Object.keys(param)[index];
-		for( var i in param[paraName]){
-			buildArgs(param, altparam, argStr + param[paraName][i], index+1);
+		if(param[paraName].length == 0){
+			buildArgs(param, argStr + "\"TestString\"", index+1);
+		}else{
+			for( var i in param[paraName]){
+				buildArgs(param, argStr + param[paraName][i], index+1);
+			}
 		}	
 	}else{
 		//console.log("Args", arg);
@@ -200,20 +207,49 @@ function buildArgs(param, altparam, argStr, index)
 }
 
 
-function generateMockFsTestCases (pathExists,fileWithContent,funcName,args) 
+function generateMockFsTestCases(pathExists,fileWithContent,funcName, args, buf, len) 
 {
 	var testCase = "";
 	// Build mock file system based on constraints.
 	var mergedFS = {};
-	if( pathExists )
-	{
-		for (var attrname in mockFileLibrary.pathExists) { mergedFS[attrname] = mockFileLibrary.pathExists[attrname]; }
-	}
-	if( fileWithContent )
-	{
-		for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
-	}
 
+	if(!pathExists){
+
+	}else{
+		if( pathExists)
+		{
+			for (var attrname in mockFileLibrary.pathExists) { mergedFS[attrname] = mockFileLibrary.pathExists[attrname]; }		
+		}
+
+		if( fileWithContent)
+		{
+			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+			mergedFS['path/fileExists'] = {'file1' : ''};
+		}
+
+		if( !fileWithContent )
+		{
+			for (var attrname in mockFileLibrary.fileWithContent) {  mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+				mergedFS['path/fileExists'] = {'file1' : 'hello'};
+				mergedFS['pathContent'] = {};
+		}
+
+		if( fileWithContent && ! buf ){
+			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+			mergedFS['pathContent']={'file1' : ''};
+		}
+		if( fileWithContent && buf ){
+			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+			mergedFS['path/fileExists']={'file1' : 'hello'};
+			mergedFS['pathContent']={'file1' : 'hi'};
+		}
+
+		if (len ) {
+			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+			mergedFS['path/fileExists'] = {};
+			mergedFS['pathContent'] = {};
+		}
+	}
 	testCase += 
 	"mock(" +
 		JSON.stringify(mergedFS)
@@ -258,7 +294,7 @@ function constraints(filePath)
 						
 						if( child.right.type === 'Literal'){ // Right is integer or string
 						
-							if( rightHand.includes("\"")){ // String
+							if( rightHand.includes("\"")){ // Right is String
 							
 								functionConstraints[funcName].constraints.push( 
 									new Constraint(
@@ -272,7 +308,7 @@ function constraints(filePath)
 										expression: expression
 									}));
 									
-							}else{ // integer
+							}else{ // Right is Integer
 							
 								functionConstraints[funcName].constraints.push( 
 									new Constraint(
@@ -288,9 +324,9 @@ function constraints(filePath)
 								
 							}
 							
-						} else if( child.right.type === 'Identifier' ){
+						} else if( child.right.type === 'Identifier' ){ // Right is identifier
 							
-							if( rightHand === "undefined"){ // Undefined
+							if( rightHand === "undefined"){ // Right is Undefined
 								functionConstraints[funcName].constraints.push( 
 									new Constraint(
 									{
@@ -302,44 +338,53 @@ function constraints(filePath)
 										operator : child.operator,
 										expression: expression
 									}));
-							}
-							
+							}	
 						}
-						
-					} // Left is not a param
-					else if ( child.left.type === 'Identifier' && params.indexOf( child.left.name ) <= -1 ) 
-					{
-						
-						
-						
-						
-						
 					}// Left is a method call containing param
 					else if( child.left.type === 'CallExpression' && params.indexOf( child.left.callee.object.name ) > -1 )
 					{
 						// get expression from original source code:
 						var expression = buf.substring(child.range[0], child.range[1]);
 						
-						// For method indexof
+						// For method "indexof"
 						if( child.left.callee.property.name =='indexOf' ){
-							console.log("Callee", child.left.arguments[0].value);
-							var rightHand = genStr(child.left.arguments[0].value,parseInt(buf.substring(child.right.range[0], child.right.range[1])));
+							//console.log("Callee", child.left.arguments[0].value);
 							
 							functionConstraints[funcName].constraints.push( 
 								new Constraint(
 								{
 									ident: child.left.callee.object.name,
-									value: "\"" + rightHand + "\"",
-									altvalue: "\"\"", 
+									value: "\"" + genStr(child.left.arguments[0].value,
+														parseInt(buf.substring(child.right.range[0], child.right.range[1]))) + "\"", 
+														//A string that contain substr at index
+									altvalue: "\""+ genAntiStr(child.left.arguments[0].value,
+														parseInt(buf.substring(child.right.range[0], child.right.range[1]))) +"\"", 
+														//Empty string that does not contain substr at index 
 									funcName: funcName,
 									kind: "string",
 									operator : child.operator,
 									expression: expression
 								}));
 						}
+					}// Left is not a param but a variable from param
+					else if( child.left.type === 'Identifier' && child.left.name == 'area'){
+						var expression = buf.substring(child.range[0], child.range[1]);
+						var rightHand = buf.substring(child.right.range[0], child.right.range[1])
+						functionConstraints[funcName].constraints.push( 
+								new Constraint(
+								{
+									ident: "phoneNumber",
+									value: "\"" + genStr(rightHand.substring(1,rightHand.length-1),0) + "\"", 
+														//A string that contain substr at index
+									altvalue: "\""+ genAntiStr(rightHand.substring(1,rightHand.length-1),0) +"\"", 
+														//Empty string that does not contain substr at index 
+									funcName: funcName,
+									kind: "string",
+									operator : child.operator,
+									expression: expression
+								}));
 					}
 				}
-				
 				
 
 				if( child.type === 'BinaryExpression' && (child.operator == "<" || child.operator == "<=" || child.operator == ">" || child.operator == ">=") )
@@ -365,7 +410,43 @@ function constraints(filePath)
 								}));
 							
 						}
+					}
+				}
+				
+				if( child.type == 'LogicalExpression' && (child.operator == '||' || child.operator == '&&') )
+				{
+					//console.log("Left name", child.left.argument.name);
+					if( child.left.type === 'UnaryExpression' && child.left.operator == "!" && params.indexOf( child.left.argument.name ) > -1)
+					{
+						
+						functionConstraints[funcName].constraints.push( 
+							new Constraint(
+							{
+								ident: child.left.argument.name,
+								value: true,
+								altvalue: false,
+								funcName: funcName,
+								kind: "boolean",
+								operator : child.left.operator,
+							}));
+					}
+					
+					if(child.right.type === 'UnaryExpression' && child.right.operator == "!" ){
+						
+						if(child.right.argument.type == "MemberExpression"  && params.indexOf( child.right.argument.object.name ) > -1){
+							
+							functionConstraints[funcName].constraints.push( 
+								new Constraint(
+								{
+									ident: child.right.argument.object.name,
+									value: "{"+child.right.argument.property.name+":"+"true"+"}",
+									altvalue: "{"+child.right.argument.property.name+":"+"false"+"}",
+									funcName: funcName,
+									kind: "boolean",
+									operator : child.right.operator,
+								}));							
 
+						}					
 					}
 				}
 				
@@ -417,6 +498,7 @@ function constraints(filePath)
 
 			});
 
+			
 			console.log( functionConstraints[funcName]);
 
 		}
@@ -465,6 +547,14 @@ function genStr(substr, index){
 	
 	str += substr;
 	return str;
+}
+
+// Generate a string which doesn't contain "substr" at index of "index"
+function genAntiStr(substr, index){
+	var str = "";
+	
+	if(index == -1) return str+substr;
+	else return "";
 }
 
 function functionName( node )

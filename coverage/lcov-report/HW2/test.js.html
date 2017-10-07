@@ -22,7 +22,7 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>47/47</span>
+        <span class='fraction'>94/94</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -37,7 +37,7 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>47/47</span>
+        <span class='fraction'>94/94</span>
       </div>
     </div>
   </div>
@@ -90,7 +90,101 @@
 45
 46
 47
-48</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
@@ -140,57 +234,104 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var subject = require('./subject.js');
 var mock = require('mock-fs');
 var mystery = require('./mystery.js');
-subject.inc(1,undefined);
-subject.inc(1,"Salt");
-subject.inc(-6,undefined);
-subject.inc(-6,"Salt");
-subject.weird(18,5,44,"strict");
-subject.weird(18,5,44,"strictSalt");
-subject.weird(18,5,35,"strict");
-subject.weird(18,5,35,"strictSalt");
-subject.weird(18,-1,44,"strict");
-subject.weird(18,-1,44,"strictSalt");
-subject.weird(18,-1,35,"strict");
-subject.weird(18,-1,35,"strictSalt");
-subject.weird(-3,5,44,"strict");
-subject.weird(-3,5,44,"strictSalt");
-subject.weird(-3,5,35,"strict");
-subject.weird(-3,5,35,"strictSalt");
-subject.weird(-3,-1,44,"strict");
-subject.weird(-3,-1,44,"strictSalt");
-subject.weird(-3,-1,35,"strict");
-subject.weird(-3,-1,35,"strictSalt");
-mock({"path/fileExists":{},"pathContent":{"file1":"text content"}});
-	subject.fileTest('path/fileExists','pathContent/file1','path/fileExists',undefined,undefined,'pathContent/file1',undefined,undefined);
+subject.inc(6,undefined);
+subject.inc(6,"Salt");
+subject.inc(-11,undefined);
+subject.inc(-11,"Salt");
+subject.weird(12,7,48,"strict");
+subject.weird(12,7,48,"werw");
+subject.weird(12,7,48,"strictSalt");
+subject.weird(12,7,48,"");
+subject.weird(12,7,31,"strict");
+subject.weird(12,7,31,"werw");
+subject.weird(12,7,31,"strictSalt");
+subject.weird(12,7,31,"");
+subject.weird(12,-7,48,"strict");
+subject.weird(12,-7,48,"werw");
+subject.weird(12,-7,48,"strictSalt");
+subject.weird(12,-7,48,"");
+subject.weird(12,-7,31,"strict");
+subject.weird(12,-7,31,"werw");
+subject.weird(12,-7,31,"strictSalt");
+subject.weird(12,-7,31,"");
+subject.weird(-4,7,48,"strict");
+subject.weird(-4,7,48,"werw");
+subject.weird(-4,7,48,"strictSalt");
+subject.weird(-4,7,48,"");
+subject.weird(-4,7,31,"strict");
+subject.weird(-4,7,31,"werw");
+subject.weird(-4,7,31,"strictSalt");
+subject.weird(-4,7,31,"");
+subject.weird(-4,-7,48,"strict");
+subject.weird(-4,-7,48,"werw");
+subject.weird(-4,-7,48,"strictSalt");
+subject.weird(-4,-7,48,"");
+subject.weird(-4,-7,31,"strict");
+subject.weird(-4,-7,31,"werw");
+subject.weird(-4,-7,31,"strictSalt");
+subject.weird(-4,-7,31,"");
+mock({"path/fileExists":{},"pathContent":{}});
+	subject.fileTest();
 mock.restore();
-mock({"pathContent":{"file1":"text content"}});
-	subject.fileTest('path/fileExists','pathContent/file1','path/fileExists',undefined,undefined,'pathContent/file1',undefined,undefined);
+mock({"path/fileExists":{},"pathContent":{}});
+	subject.fileTest();
 mock.restore();
-mock({"path/fileExists":{}});
-	subject.fileTest('path/fileExists','pathContent/file1','path/fileExists',undefined,undefined,'pathContent/file1',undefined,undefined);
+mock({"path/fileExists":{"file1":"hello"},"pathContent":{"file1":"hi"}});
+	subject.fileTest();
+mock.restore();
+mock({"path/fileExists":{"file1":""},"pathContent":{"file1":""}});
+	subject.fileTest();
 mock.restore();
 mock({});
-	subject.fileTest('path/fileExists','pathContent/file1','path/fileExists',undefined,undefined,'pathContent/file1',undefined,undefined);
+	subject.fileTest();
 mock.restore();
-subject.normalize('');
-subject.normalize('');
-subject.format('','','');
-subject.format('','','');
-subject.format('','','');
-subject.format('','','');
-subject.format('','','');
-subject.format('','','');
-subject.format('','','');
-subject.format('','','');
-subject.blackListNumber('');
-subject.blackListNumber('');
+mock({});
+	subject.fileTest();
+mock.restore();
+mock({});
+	subject.fileTest();
+mock.restore();
+mock({});
+	subject.fileTest();
+mock.restore();
+mock({"path/fileExists":{},"pathContent":{}});
+	subject.fileTest();
+mock.restore();
+mock({"path/fileExists":{},"pathContent":{}});
+	subject.fileTest();
+mock.restore();
+mock({"path/fileExists":{"file1":"hello"},"pathContent":{}});
+	subject.fileTest();
+mock.restore();
+mock({"path/fileExists":{"file1":"hello"},"pathContent":{}});
+	subject.fileTest();
+mock.restore();
+mock({});
+	subject.fileTest();
+mock.restore();
+mock({});
+	subject.fileTest();
+mock.restore();
+mock({});
+	subject.fileTest();
+mock.restore();
+mock({});
+	subject.fileTest();
+mock.restore();
+subject.normalize("TestString");
+subject.format("TestString","TestString",true);
+subject.format("TestString","TestString",{normalize:true});
+subject.format("TestString","TestString",false);
+subject.format("TestString","TestString",{normalize:false});
+subject.blackListNumber("212");
+subject.blackListNumber("");
 &nbsp;</pre></td></tr>
 </table></pre>
 <div class='push'></div><!-- for sticky footer -->
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Oct 06 2017 13:33:12 GMT-0400 (Eastern Daylight Time)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Oct 06 2017 23:07:50 GMT-0400 (Eastern Daylight Time)
 </div>
 </div>
 <script src="../prettify.js"></script>
