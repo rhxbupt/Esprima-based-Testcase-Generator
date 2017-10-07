@@ -48,7 +48,7 @@ function Constraint(properties)
 	this.kind = properties.kind;
 }
 
-fakeDemo();
+//fakeDemo();
 
 function fakeDemo()
 {
@@ -106,7 +106,7 @@ var args = [];
 function generateTestCases()
 {
 	// Add mistery.js to test
-	var content = "var subject = require('./subject.js');\nvar mock = require('mock-fs');\n" + "var mystery = require('./mystery.js');\n";
+	var content = "var subject = require('./subject.js');\nvar mock = require('mock-fs');\n"// + "var mystery = require('./mystery.js');\n"
 	for ( var funcName in functionConstraints )
 	{
 		//console.log("FuncName", funcName);
@@ -132,14 +132,14 @@ function generateTestCases()
 		if( pathExists || fileWithContent )
 		{
 			//content += generateMockFsTestCases(pathExists,fileWithContent,funcName, args);
-			// Bonus...generate constraint variations test cases....
 			//content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, args);
 			//content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, args);
 			//content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args);
 			args = [];
-			//buildArgs(params, "", 0);
+			buildArgs(params, "", 0);
 			console.log("Args",args);
-			var buf=true, len=true;
+			var buf = true;
+			var len = true;
 			content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,buf,len);
 			content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,!buf,len);
 			content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,buf,!len);
@@ -185,7 +185,9 @@ function buildArgs(param, argStr, index)
 		var paraName = Object.keys(param)[index];
 		//console.log("Param",param[paraName]);
 		if(param[paraName].length == 0){
-			buildArgs(param, argStr + "\"TestString\"" + ",", index+1);
+			if(paraName == "phoneNumber") buildArgs(param, argStr + "\"" + faker.phone.phoneNumberFormat() + "\"" + ",", index+1);
+			else if(paraName == "formatString") buildArgs(param, argStr + "\"" + faker.phone.phoneFormats() + "\"" + ",", index+1);
+			else buildArgs(param, argStr + "\"TestString\"" + ",", index+1);
 		}else{
 			for( var i in param[paraName]){
 				buildArgs(param, argStr + param[paraName][i] + ",", index+1);
@@ -194,7 +196,9 @@ function buildArgs(param, argStr, index)
 	}else if(index == Object.keys(param).length-1){
 		var paraName = Object.keys(param)[index];
 		if(param[paraName].length == 0){
-			buildArgs(param, argStr + "\"TestString\"", index+1);
+			if(paraName == "phoneNumber") buildArgs(param, argStr + "\"" + faker.phone.phoneNumberFormat() + "\"", index+1);
+			else if(paraName == "formatString") buildArgs(param, argStr + "\"" + faker.phone.phoneFormats() + "\"", index+1);
+			else buildArgs(param, argStr + "\"TestString\"", index+1);
 		}else{
 			for( var i in param[paraName]){
 				buildArgs(param, argStr + param[paraName][i], index+1);
@@ -216,36 +220,33 @@ function generateMockFsTestCases(pathExists,fileWithContent,funcName, args, buf,
 	if(!pathExists){
 
 	}else{
-		if( pathExists)
-		{
-			for (var attrname in mockFileLibrary.pathExists) { mergedFS[attrname] = mockFileLibrary.pathExists[attrname]; }		
-		}
+		for (var attrname in mockFileLibrary.pathExists) { mergedFS[attrname] = mockFileLibrary.pathExists[attrname]; }		
 
 		if( fileWithContent)
 		{
-			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+			//for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
 			mergedFS['path/fileExists'] = {'file1' : ''};
 		}
 
 		if( !fileWithContent )
 		{
-			for (var attrname in mockFileLibrary.fileWithContent) {  mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
-				mergedFS['path/fileExists'] = {'file1' : 'hello'};
-				mergedFS['pathContent'] = {};
+			//for (var attrname in mockFileLibrary.fileWithContent) {  mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+			mergedFS['path/fileExists'] = {'file1' : 'hello'};
+			mergedFS['pathContent'] = {};
 		}
 
-		if( fileWithContent && ! buf ){
-			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+		if( fileWithContent && !buf ){
+			//for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
 			mergedFS['pathContent']={'file1' : ''};
 		}
 		if( fileWithContent && buf ){
-			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+			//for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
 			mergedFS['path/fileExists']={'file1' : 'hello'};
 			mergedFS['pathContent']={'file1' : 'hi'};
 		}
 
-		if (len ) {
-			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
+		if(len) {
+			//for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
 			mergedFS['path/fileExists'] = {};
 			mergedFS['pathContent'] = {};
 		}
@@ -256,7 +257,7 @@ function generateMockFsTestCases(pathExists,fileWithContent,funcName, args, buf,
 		+
 	");\n";
 
-	testCase += "\tsubject.{0}({1});\n".format(funcName, args );
+	testCase += "\tsubject.{0}({1});\n".format(funcName, args[1]);
 	testCase+="mock.restore();\n";
 	return testCase;
 }
@@ -374,10 +375,11 @@ function constraints(filePath)
 								new Constraint(
 								{
 									ident: "phoneNumber",
-									value: "\"" + genStr(rightHand.substring(1,rightHand.length-1),0) + "\"", 
-														//A string that contain substr at index
+									value: "\"" + rightHand.substring(1,rightHand.length-1) 
+										+ faker.phone.phoneNumberFormat().substring(rightHand.length-2, faker.phone.phoneNumberFormat().length) + "\"", 
+										//A string that contain substr at index
 									altvalue: "\""+ genAntiStr(rightHand.substring(1,rightHand.length-1),0) +"\"", 
-														//Empty string that does not contain substr at index 
+										//Empty string that does not contain substr at index 
 									funcName: funcName,
 									kind: "string",
 									operator : child.operator,
