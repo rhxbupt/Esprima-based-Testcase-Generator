@@ -29,5 +29,4 @@ By xding3
 
 ![](https://github.ncsu.edu/xding3/HW2/blob/master/Screenshot/mystery.png)
 
-## Specification ##
 

@@ -137,26 +137,26 @@ function generateTestCases()
 			//content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args);
 			args = [];
 			buildArgs(params, "", 0);
-			//console.log("Args",args);
+			console.log("Args",args);
 			var buf = true;
 			var len = true;
 			for(var n in args){
-				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,buf,len);
-				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,!buf,len);
-				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,buf,!len);
-				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,!buf,!len);
-				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,buf,len);
-				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,!buf,len);
-				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,buf,!len);
-				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,!buf,!len);
-				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,buf,len);
-				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,!buf,len);
-				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,buf,!len);
-				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,!buf,!len);
-				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,buf,len);
-				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,!buf,len);
-				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,buf,!len);
-				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,!buf,!len);				
+				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args[n],buf,len);
+				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args[n],!buf,len);
+				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args[n],buf,!len);
+				content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args[n],!buf,!len);
+				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args[n],buf,len);
+				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args[n],!buf,len);
+				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args[n],buf,!len);
+				content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args[n],!buf,!len);
+				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args[n],buf,len);
+				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args[n],!buf,len);
+				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args[n],buf,!len);
+				content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args[n],!buf,!len);
+				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args[n],buf,len);
+				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args[n],!buf,len);
+				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args[n],buf,!len);
+				content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args[n],!buf,!len);				
 			}
 
 		} else// Generate Simple Test Cases
@@ -255,7 +255,7 @@ function generateMockFsTestCases(pathExists,fileWithContent,funcName, args, buf,
 		+
 	");\n";
 
-	testCase += "\tsubject.{0}({1});\n".format(funcName, args[1]);
+	testCase += "\tsubject.{0}({1});\n".format(funcName, args);
 	testCase+="mock.restore();\n";
 	return testCase;
 }
