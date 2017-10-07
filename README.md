@@ -2,11 +2,15 @@
 By xding3
 
 ## Execution ##
-
+0. Direct to the main folder
 1. Install packages:  `npm install`  
 2. Generate test files: `node main.js`
-3. See coverage: `node_modules\.bin\istanbul cover test.js` (Windows)
-4. (Optional) See a fully annotated html report: `start coverage/lcov-report/HW2/subject.js.html` (Windows)
+3. See coverage: 
+`[Windows] node_modules\.bin\istanbul cover test.js` or
+`[Other] node_modules/.bin/istanbul cover test.js`
+4. (Optional) See a fully annotated HTML report: 
+`[Windows]start coverage/lcov-report/HW2/subject.js.html` or
+`[Other]open coverage/lcov-report/TestGeneration/subject.js.html`
 
 ## Files ##
 
@@ -17,7 +21,13 @@ By xding3
  **test.js**: This is an automatically created test script. Running `node main.js` will create a new `test.js`.
 
 ## Screenshots ##
+1. Coverage for subject.js
 
+![](https://github.ncsu.edu/xding3/HW2/blob/master/Screenshot/subject.png)
+
+2. Coverage for mystery.js
+
+![](https://github.ncsu.edu/xding3/HW2/blob/master/Screenshot/mystery.png)
 
 ## Specification ##
 
