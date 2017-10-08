@@ -6,12 +6,15 @@ By xding3
 1. Install packages:  `npm install`  
 2. Generate test files: `node main.js`
 3. See coverage: 
-`[Windows] node_modules\.bin\istanbul cover test.js` or
-`[Other] node_modules/.bin/istanbul cover test.js`
+```
+[Windows] node_modules\.bin\istanbul cover test.js <br>
+[Other] node_modules/.bin/istanbul cover test.js
+```
 4. (Optional) See a fully annotated HTML report: 
-`[Windows]start coverage/lcov-report/HW2/subject.js.html` or
-`[Other]open coverage/lcov-report/TestGeneration/subject.js.html`
-
+```
+[Windows]start coverage/lcov-report/HW2/subject.js.html <br>
+[Other]open coverage/lcov-report/TestGeneration/subject.js.html
+```
 ## Files ##
 
  **main.js**: Main code driving constraint discovering and test case generation.

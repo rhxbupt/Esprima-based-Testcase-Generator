@@ -63,15 +63,44 @@ var mockFileLibrary =
 {
 	pathExists:
 	{
-		'path/fileExists': {}
+		'path/fileExists':
+		{
+			
+		}
+	},
+	pathNotExists:
+	{
+		
 	},
 	fileWithContent:
 	{
-		pathContent: 
+		'pathWithContent': 
 		{	
   			file1: 'text content',
 		}
-	}
+	},
+	fileWithoutContent:
+	{
+		'pathWithoutContent': 
+		{	
+			file1: '',
+		}
+	},
+	dirWithContent:
+	{
+		'dirWithContent': 
+		{	
+  			file1: '',
+		}
+	},
+	dirWithoutContent:
+	{
+		'dirWithoutContent': 
+		{	
+  			
+		}
+	},
+	
 };
 
 function initalizeParams(constraints)
@@ -116,48 +145,24 @@ function generateTestCases()
 		var constraints = functionConstraints[funcName].constraints;
 		// Handle global constraints...
 		var fileWithContent = _.some(constraints, {kind: 'fileWithContent' });
+		var dirWithContent  = _.some(constraints, {kind: 'dirWithContent' });
 		var pathExists      = _.some(constraints, {kind: 'fileExists' });
 
 		fillParams(constraints,params,"value")
 		fillParams(constraints,params,"altvalue") // Put all param optional values into param array
 		
-		//console.log("ALT",altparams)
-		// console.log("P",params)
+		// console.log("ALT",altparams)
+		 console.log("P",params)
 		// Prepare function arguments.
-		//var args = Object.keys(params).map( function(k) {return params[k]; }).join(",");
-		//var altargs = Object.keys(altparams).map( function(k) {return altparams[k]; }).join(",");
+		// var args = Object.keys(params).map( function(k) {return params[k]; }).join(",");
+		// var altargs = Object.keys(altparams).map( function(k) {return altparams[k]; }).join(",");
 
-		if( pathExists || fileWithContent )
-		{
-			//content += generateMockFsTestCases(pathExists,fileWithContent,funcName, args);
-			//content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, args);
-			//content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, args);
-			//content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args);
-			
+		if( pathExists || fileWithContent || dirWithContent )
+		{			
 			args = [];
-			buildArgs(params, "", 0);
+			buildArgsForMock(params, "", 0);
 			//console.log("Args",args);
-			
-			var buf = true;
-			var len = true;
-
-			content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,buf,len);
-			content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,!buf,len);
-			content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,buf,!len);
-			content += generateMockFsTestCases(pathExists,fileWithContent,funcName,args,!buf,!len);
-			content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,buf,len);
-			content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,!buf,len);
-			content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,buf,!len);
-			content += generateMockFsTestCases(pathExists,!fileWithContent,funcName,args,!buf,!len);
-			content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,buf,len);
-			content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,!buf,len);
-			content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,buf,!len);
-			content += generateMockFsTestCases(!pathExists,fileWithContent,funcName,args,!buf,!len);
-			content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,buf,len);
-			content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,!buf,len);
-			content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,buf,!len);
-			content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName,args,!buf,!len);				
-
+			content += generateMockFsTestCases(pathExists, fileWithContent, dirWithContent, funcName, args);	
 		} else// Generate Simple Test Cases
 		{
 			args = [];
@@ -210,57 +215,70 @@ function buildArgs(param, argStr, index)
 }
 
 
-function generateMockFsTestCases(pathExists,fileWithContent,funcName, args, buf, len) 
+// Recursion method that prepares function arguments (For mocking test case)
+function buildArgsForMock(param, argStr, index)
+{
+	//console.log("Length", Object.keys(param).length);
+	if(index < Object.keys(param).length-1){
+		var paraName = Object.keys(param)[index];
+		//console.log("Param",param[paraName]);
+		if(param[paraName].length == 0){
+			buildArgsForMock(param, argStr + "\"TestString\"" + ",", index+1);
+		}else{
+			
+			if(param[paraName].includes('\'path/fileExists\'') && param[paraName].includes('\'dirWithContent\'')){
+				param[paraName].splice(param[paraName].indexOf('\'path/fileExists\''),1);
+			}else if(param[paraName].includes('\'path/fileExists\'') && param[paraName].includes('\'pathWithContent/file1\'')){
+				param[paraName].splice(param[paraName].indexOf('\'path/fileExists\''),1);
+			}
+			for( var i in param[paraName]){
+				buildArgsForMock(param, argStr + param[paraName][i] + ",", index+1);
+			}
+			
+		}
+	}else if(index == Object.keys(param).length-1){
+		var paraName = Object.keys(param)[index];
+		if(param[paraName].length == 0){
+			buildArgsForMock(param, argStr + "\"TestString\"", index+1);
+		}else{
+			
+			if(param[paraName].includes("\'path/fileExists\'") && param[paraName].includes("\'dirWithContent\'")){
+				param[paraName].splice(param[paraName].indexOf("\'path/fileExists\'"),1);
+			}else if(param[paraName].includes('\'path/fileExists\'') && param[paraName].includes('\'pathWithContent/file1\'')){
+				param[paraName].splice(param[paraName].indexOf('\'path/fileExists\''),1);
+			}			
+			for( var i in param[paraName]){	
+				buildArgsForMock(param, argStr + param[paraName][i], index+1);
+			}
+			
+		}	
+	}else{
+		//console.log("Args", args);
+		args.push(argStr);
+	}
+}
+
+
+function generateMockFsTestCases(pathExists,fileWithContent,dirWithContent,funcName,args) 
 {
 	var testCase = "";
 	// Build mock file system based on constraints.
 	var mergedFS = {};
-
-	if(!pathExists ){
-
-	}else{
-		if( pathExists )
-		{
-			for (var attrname in mockFileLibrary.pathExists) { mergedFS[attrname] = mockFileLibrary.pathExists[attrname]; }
-		}
-
-		 if( fileWithContent )
-		{
-			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
-			mergedFS['path/fileExists'] = {'file1' : ''};
-		}
-
-		if( !fileWithContent )
-		{
-			for (var attrname in mockFileLibrary.fileWithContent) {  mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
-				mergedFS['path/fileExists'] = {'file1' : 'hello'};
-				mergedFS['pathContent'] = {};
-		}
-
-		if( fileWithContent && ! buf ){
-			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
-			mergedFS['pathContent']={'file1' : ''};
-		}
-		if( fileWithContent && buf ){
-			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
-			mergedFS['path/fileExists']={'file1' : 'hello'};
-			mergedFS['pathContent']={'file1' : 'hi'};
-		}
-
-		if ( len ) {
-			for (var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname]; }
-			mergedFS['path/fileExists'] = {};
-			mergedFS['pathContent'] = {};
-		}
-	}
 	
+	for(var attrname in mockFileLibrary.pathExists) { mergedFS[attrname] = mockFileLibrary.pathExists[attrname];}
+	for(var attrname in mockFileLibrary.pathNotExists) { mergedFS[attrname] = mockFileLibrary.pathNotExists[attrname];}
+	for(var attrname in mockFileLibrary.fileWithContent) { mergedFS[attrname] = mockFileLibrary.fileWithContent[attrname];}
+	for(var attrname in mockFileLibrary.fileWithoutContent) { mergedFS[attrname] = mockFileLibrary.fileWithoutContent[attrname];}
+	for(var attrname in mockFileLibrary.dirWithContent) { mergedFS[attrname] = mockFileLibrary.dirWithContent[attrname];}
+	for(var attrname in mockFileLibrary.dirWithoutContent) { mergedFS[attrname] = mockFileLibrary.dirWithoutContent[attrname];}
+
 	testCase += 
 	"mock(" +
 		JSON.stringify(mergedFS)
 		+
 	");\n";
 
-	testCase += "\tsubject.{0}({1});\n".format(funcName, args[1]);
+	for(var n in args)testCase += "\tsubject.{0}({1});\n".format(funcName, args[n]);
 	testCase+="mock.restore();\n";
 	return testCase;
 }
@@ -465,7 +483,8 @@ function constraints(filePath)
 							new Constraint(
 							{
 								ident: params[p],
-								value:  "'pathContent/file1'",
+								value:  "'pathWithContent/file1'",
+								altvalue: "'pathWithoutContent/file1'",
 								funcName: funcName,
 								kind: "fileWithContent",
 								operator : child.operator,
@@ -473,6 +492,30 @@ function constraints(filePath)
 							}));
 						}
 					}
+				}
+				
+				if( child.type == "CallExpression" &&
+					 child.callee.property &&
+					 child.callee.property.name =="readdirSync")
+				{
+					for( var p =0; p < params.length; p++ )
+					{
+						if( child.arguments[0].name == params[p] )
+						{
+							functionConstraints[funcName].constraints.push( 
+							new Constraint(
+							{
+								ident: params[p],
+								// A fake path to a dir
+								value:  "'dirWithContent'",
+								altvalue:  "'dirWithoutContent'",
+								funcName: funcName,
+								kind: "dirWithContent",
+								operator : child.operator,
+								expression: expression
+							}));
+						}
+					}					
 				}
 
 				if( child.type == "CallExpression" &&
@@ -489,6 +532,7 @@ function constraints(filePath)
 								ident: params[p],
 								// A fake path to a file
 								value:  "'path/fileExists'",
+								altvalue:  "'path/fileNotExists'",
 								funcName: funcName,
 								kind: "fileExists",
 								operator : child.operator,
@@ -497,11 +541,13 @@ function constraints(filePath)
 						}
 					}					
 				}
+				
+
 
 			});
 
 			
-			//console.log( functionConstraints[funcName]);
+			console.log( functionConstraints[funcName]);
 
 		}
 	});
