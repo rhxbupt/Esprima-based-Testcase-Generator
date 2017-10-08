@@ -152,7 +152,7 @@ function generateTestCases()
 		fillParams(constraints,params,"altvalue") // Put all param optional values into param array
 		
 		// console.log("ALT",altparams)
-		 console.log("P",params)
+		// console.log("P",params)
 		// Prepare function arguments.
 		// var args = Object.keys(params).map( function(k) {return params[k]; }).join(",");
 		// var altargs = Object.keys(altparams).map( function(k) {return altparams[k]; }).join(",");
@@ -547,7 +547,7 @@ function constraints(filePath)
 			});
 
 			
-			console.log( functionConstraints[funcName]);
+			//console.log( functionConstraints[funcName]);
 
 		}
 	});
