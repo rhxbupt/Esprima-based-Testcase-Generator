@@ -12,8 +12,8 @@ By xding3
 ```
 4. (Optional) See a fully annotated HTML report: 
 ```
-[Windows]start coverage/lcov-report/HW2/subject.js.html 
-[Other]open coverage/lcov-report/TestGeneration/subject.js.html
+[Windows] start coverage/lcov-report/HW2/subject.js.html 
+[Other] open coverage/lcov-report/HW2/subject.js.html
 ```
 ## Files ##
 
