@@ -1,8 +1,8 @@
 var fs = require("fs");
 
 function inc(p, q){
-   if(q == 77 ) q =1;
-   if( p < -100 )
+   if(q == -77 ) q =1;
+   if( p < 100 )
    {
    	p = -p;
    }
@@ -11,24 +11,24 @@ function inc(p, q){
 
 function weird(x,y,z, mode)
 {
-    if( x > 87 && y < 70 )
+    if( x > 99 && y < 11 )
     {
         z = 33;
     }    
-    else if( z < 42 )
+    else if( z < 33 )
     {
-        if( mode == "strictly" )
+        if( mode == "mode" )
         {
             return 0;
         }
-        else if( mode.indexOf("bob") == 0 )
+        else if( mode.indexOf("street") == 0 )
         {
             return 1;
         }
     }
     else
     {
-        if( mode != "stricter" )
+        if( mode != "strictly" )
         {
             return y = z / x;
         }
@@ -37,14 +37,14 @@ function weird(x,y,z, mode)
 }
 
 
-function fileTest(filePath, dir)
+function fileTest(filePath, dire)
 {
-	if (!fs.existsSync(dir)){
+	if (!fs.existsSync(dire)){
 
    	    return false;
     }
     
-    var files = fs.readdirSync(dir);
+    var files = fs.readdirSync(dire);
     if( files.length == 0 )
     {
         return false;
@@ -73,7 +73,7 @@ function normalize(phoneNumber) {
 function format(phoneNumber, formatString, options) 
 {
     // Normalize the phone number first unless not asked to do so in the options
-    if (!options || !options.normalize) {
+    if (!options || !options.strongbow) {
       phoneNumber = normalize(phoneNumber)
     };
 
@@ -89,7 +89,7 @@ function blackListNumber(phoneNumber)
 {
 	var num = format(phoneNumber, "(NNN) NNN-NNNN");
 	var area = num.substring(1,4);
-	if( area != "919" )
+	if( area != "212" )
 	{
 		return true;
 	}
@@ -102,4 +102,3 @@ exports.format = format;
 exports.inc = inc;
 exports.weird = weird;
 exports.blackListNumber = blackListNumber;
-

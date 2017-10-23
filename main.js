@@ -13,8 +13,8 @@ function main()
 
 	if( args.length == 0 )
 	{
-		// Default file: subject.js
-		args = ["subject.js"];
+		// Default file: mystery.js
+		args = ["mystery.js"];
 	}
 	var filePath = args[0];
 
@@ -134,7 +134,7 @@ var args = [];
 
 function generateTestCases()
 {
-	var content = "var subject = require('./subject.js');\nvar mock = require('mock-fs');\n"// + "var subject = require('./subject.js');\n"
+	var content = "var mystery = require('./mystery.js');\nvar mock = require('mock-fs');\n"// + "var mystery = require('./mystery.js');\n"
 	for ( var funcName in functionConstraints )
 	{
 		//console.log("FuncName", funcName);
@@ -170,7 +170,7 @@ function generateTestCases()
 			// Emit simple test case.
 			buildArgs(params, "", 0);
 			//console.log( args )
-			for(var n in args) content += "subject.{0}({1});\n".format(funcName, args[n]);
+			for(var n in args) content += "mystery.{0}({1});\n".format(funcName, args[n]);
 			
 		}
 
@@ -278,7 +278,7 @@ function generateMockFsTestCases(pathExists,fileWithContent,dirWithContent,funcN
 		+
 	");\n";
 
-	for(var n in args)testCase += "\tsubject.{0}({1});\n".format(funcName, args[n]);
+	for(var n in args)testCase += "\tmystery.{0}({1});\n".format(funcName, args[n]);
 	testCase+="mock.restore();\n";
 	return testCase;
 }
@@ -355,6 +355,21 @@ function constraints(filePath)
 										ident: child.left.name,
 										value: rightHand,
 										altvalue: "\"Salt\"", 
+										funcName: funcName,
+										kind: "string",
+										operator : child.operator,
+										expression: expression
+									}));
+							}	
+						} else if( child.right.type === 'UnaryExpression' && child.right.operator === "-" ){ // Right is identifier
+							
+							if( child.right.argument.type === "Literal"){ // Right is Undefined
+								functionConstraints[funcName].constraints.push( 
+									new Constraint(
+									{
+										ident: child.left.name,
+										value: rightHand,
+										altvalue: parseInt(rightHand) + createConcreteIntegerValue(true, parseInt(rightHand)), 
 										funcName: funcName,
 										kind: "string",
 										operator : child.operator,
@@ -547,7 +562,7 @@ function constraints(filePath)
 			});
 
 			
-			//console.log( functionConstraints[funcName]);
+			console.log( functionConstraints[funcName]);
 
 		}
 	});
