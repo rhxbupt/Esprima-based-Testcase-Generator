@@ -1,4 +1,4 @@
-# CSC-519-HW2 #
+# Test Generation #
 By xding3
 
 ## Execution ##
@@ -26,14 +26,14 @@ By xding3
 ## Screenshots ##
 1. Coverage for subject.js
 
-![](https://github.ncsu.edu/xding3/HW2/blob/master/Screenshot/subject.png)
+![](https://github.com/DinMouMou/Test-Generation/blob/master/Screenshot/subject.png)
 
 2. Coverage for mystery.js
 
-![](https://github.ncsu.edu/xding3/HW2/blob/master/Screenshot/mystery.png)
+![](https://github.com/DinMouMou/Test-Generation/blob/master/Screenshot/mystery.png)
 
 
 ## Specification ##
-The main.js is now generating test cases for subject.js. To work on mystery.js, you can replace all the `subject` string in main.js with `mystery`.
+The test generation (main.js) is now generating test cases for subject.js. To work on mystery.js, you can replace all the `subject` string in main.js with `mystery`.
 
 
